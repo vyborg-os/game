@@ -33,6 +33,7 @@ router.post('/signup', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 // Route for user login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -41,13 +42,18 @@ router.post('/login', async (req, res) => {
       // Check if user exists
       const user = await User.findOne({ where: { email } });
       if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Email does not exist' });
       }
-  
+
       // Verify password
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      // console.log('Password from request:', password);
+      // console.log('Password from database:', user.password);
+      const passwordMatch = await bcrypt.compare(
+        `${req.body.password}`,
+        user.password
+        );
       if (!passwordMatch) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Invalid password' });
       }
   
       // Generate JWT token
@@ -59,5 +65,6 @@ router.post('/login', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+  
   
 module.exports = router;
