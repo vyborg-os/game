@@ -34,11 +34,5 @@ const User = db.define('User', {
   }
 });
 
-// Hash password before saving user
-User.beforeCreate(async (user, options) => {
-  const hashedPassword = await bcrypt.hash(user.password, 10);
-  user.password = hashedPassword;
-});
-
 
 module.exports = User;

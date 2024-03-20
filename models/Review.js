@@ -4,15 +4,15 @@ const { DataTypes } = require('sequelize');
 const db = require('../config/database');
 
 const Review = db.define('Review', {
-  title: {
-    type: DataTypes.STRING,
+  userID: {
+    type: DataTypes.INTEGER,
     allowNull: false
   },
-  genre: {
-    type: DataTypes.STRING
+  gameID: {
+    type: DataTypes.INTEGER
   },
-  releaseDate: {
-    type: DataTypes.DATE
+  reviews: {
+    type: DataTypes.STRING
   },
   // Add more fields as needed
 });

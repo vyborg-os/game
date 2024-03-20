@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const gameRoutes = require('./routes/gameRoute');
 const authRoutes = require('./routes/authRoute');
 const adminRoutes = require('./routes/adminRoute');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,9 @@ app.use(express.json());
 
 // Mount game routes
 app.use('/api', gameRoutes);
+
+// Mount auth game routes
+app.use('/api/user', reviewRoutes);
 
 // Mount authentication routes
 app.use('/api/auth', authRoutes);
