@@ -1,5 +1,5 @@
 // controllers/adminController.js
-
+const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
@@ -67,43 +67,59 @@ exports.getAllGames = async (req, res) => {
     }
   };
   
-  // Add a new game
-  exports.addGame = async (req, res) => {
-    const { title, genre, releaseDate } = req.body;
-  
-    try {
-      const newGame = await Game.create({ title, genre, releaseDate });
-      res.json(newGame);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal server error' });
+// Set up multer storage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'images/') 
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname)
     }
-  };
-  
-  // Update a game
-  exports.updateGame = async (req, res) => {
+});
+
+// Initialize multer with the specified storage
+const upload = multer({ storage: storage });
+
+// Add a new game with image upload
+exports.addGame = upload.single('image'), async (req, res) => {
+    const { title, category, details, releaseDate } = req.body;
+    const image = req.file.path; // Get the path of the uploaded image
+
+    try {
+        const newGame = await Game.create({ title, category, details, image, releaseDate });
+        res.json(newGame);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Update a game with image upload
+exports.updateGame = upload.single('image'), async (req, res) => {
     const gameId = req.params.id;
-    const { title, genre, releaseDate } = req.body;
-  
+    const { title, category, details, releaseDate } = req.body;
+    const image = req.file.path; // Get the path of the uploaded image
+
     try {
-      const game = await Game.findByPk(gameId);
-      if (!game) {
-        return res.status(404).json({ error: 'Game not found' });
-      }
-  
-      game.title = title;
-      game.genre = genre;
-      game.releaseDate = releaseDate;
-  
-      await game.save();
-  
-      res.json(game);
+        const game = await Game.findByPk(gameId);
+        if (!game) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        game.title = title;
+        game.category = category;
+        game.details = details;
+        game.image = image;
+        game.releaseDate = releaseDate;
+
+        await game.save();
+
+        res.json(game);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
     }
-  };
-  
+};
   // Delete a game
   exports.deleteGame = async (req, res) => {
     const gameId = req.params.id;

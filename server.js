@@ -5,10 +5,13 @@ const gameRoutes = require('./routes/gameRoute');
 const authRoutes = require('./routes/authRoute');
 const adminRoutes = require('./routes/adminRoute');
 const reviewRoutes = require('./routes/reviewRoutes');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Allow all origins during development
+app.use(cors());
 
 // app.use(bodyParser.json());
 app.use(express.json());

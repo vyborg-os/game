@@ -10,7 +10,13 @@ const Game = sequelize.define('Game', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  genre: {
+  category: {
+    type: DataTypes.STRING
+  },
+  details: {
+    type: DataTypes.STRING
+  },
+  image: {
     type: DataTypes.STRING
   },
   releaseDate: {
