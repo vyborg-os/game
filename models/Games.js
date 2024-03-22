@@ -2,8 +2,6 @@
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-// const { DataTypes } = require('sequelize');
-// const db = require('../config/database');
 
 const Game = sequelize.define('Game', {
   title: {
@@ -20,9 +18,9 @@ const Game = sequelize.define('Game', {
     type: DataTypes.STRING
   },
   releaseDate: {
-    type: DataTypes.DATE
+    type: DataTypes.DATEONLY
   } }, {
-    tableName: 'games' // Explicitly specify the table name
+    tableName: 'games'
   });
 
 module.exports = Game;

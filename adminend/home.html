@@ -4,58 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="assets/fonts/webfonts/fa-brands-400.ttf">
-    <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-
 </head>
 <body>
-    <div class="col-lg-12">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Game Review Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="home.html">Games List</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="add-games.html">Add Game</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
         <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-8">
-                <center><h1>Games List</h1></center>
-                    <!-- Games table -->
-                    <table id="games-table" class="table table-responsive table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Category</th>
-                                <th>Details</th>
-                                <th>Image</th>
-                                <th>ReleaseDate</th>
-                            
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Games will be populated here -->
-                        </tbody>
-                    </table>
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h1>Games List</h1>
+                                <!-- Games table -->
+                                <div class="table-responsive">
+                                    <table id="games-table" class="table  table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Category</th>
+                                                <th>Details</th>
+                                                <th>Image</th>
+                                                <th>ReleaseDate</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Games will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4">
-                <center><h1>Add Game</h1></center>
-                    <form id="add-game-form" class="form-control">
-                        <label for="title">Title:</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
-                        <br>
-                        <label for="category">Category:</label>
-                        <input type="text" class="form-control" id="category" name="category">
-                        <br>
-                        <label for="details">Details:</label>
-                        <textarea id="details" class="form-control" name="details"></textarea>
-                        <br>
-                        <label for="releaseDate">Release Date:</label>
-                        <input type="date" class="form-control" id="releaseDate" name="releaseDate">
-                        <br>
-                        <label for="image">Image:</label>
-                        <input type="file" class="form-control" id="image" name="image">
-                        <br>
-                        <button type="submit">Add Game</button>
-                    </form>
-            </div>
+        </div>
     </div>
-</div>
+
+    <!-- Bootstrap modal for editing game -->
+    <div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="editGameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGameModalLabel">Edit Game</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for editing game -->
+                    <form id="edit-game-form" class="form-control" enctype="multipart/form-data">
+                        <input type="hidden" id="edit-game-id" name="id">
+                        <label for="edit-title">Title:</label>
+                        <input type="text" class="form-control" id="edit-title" name="title" required>
+                        <label for="edit-category">Category:</label>
+                        <input type="text" class="form-control" id="edit-category" name="category">
+                        <label for="edit-details">Details:</label>
+                        <textarea id="edit-details" class="form-control" name="details"></textarea>
+                        <label for="edit-releaseDate">Release Date:</label>
+                        <input type="date" class="form-control" id="edit-releaseDate" name="releaseDate">
+                        <label for="edit-image">Image:</label>
+                        <input type="file" class="form-control" id="edit-image" name="image">
+                        <button type="submit" class="btn btn-primary mt-3">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <script>
@@ -67,7 +101,6 @@
             try {
                 const response = await fetch('http://localhost:3000/api/admin/games', {
                     headers: {
-                        // Add authorization header with token from local storage
                         'Authorization': `${localStorage.getItem('token')}`
                     }
                 });
@@ -82,11 +115,6 @@
                 // Clear existing tables
                 gamesTableBody.innerHTML = '';
 
-                // Check if response is an array
-                if (!Array.isArray(games)) {
-                    throw new Error('Invalid response format: Expected an array of games');
-                }
-
                 // Populate table with fetched games
                 games.forEach(game => {
                     const row = document.createElement('tr');
@@ -94,52 +122,86 @@
                         <td>${game.title}</td>
                         <td>${game.category}</td>
                         <td>${game.details}</td>
-                        <td>${game.image}</td>
+                        <td><img src='http://localhost:3000/${game.image}' width="50"></td>
                         <td>${game.releaseDate}</td>
+                        <td>
+                            <a href="#" onclick="editGame('${game.id}', ' ${game.title}', '${game.category}', '${game.details}', '${game.releaseDate}')" class="btn btn-small btn-primary">Edit</a>
+                            <a href="#" onclick="deleteGame('${game.id}')" class="btn btn-small btn-danger">Delete</a>
+                            <a href="game-details.html?id=${game.id}" class="btn btn-small btn-success">View</a>
+                        </td>
                     `;
                     gamesTableBody.appendChild(row);
                 });
             } catch (error) {
-                console.error('An error occurred:', error);
+                alert('An error occurred:', error);
             }
         }
 
+        // Function to handle editing a game
+        function editGame(gameId, title, category, details, releaseDate, image) {
+            // Populate the modal with game details
+            document.querySelector('#edit-game-id').value = gameId;
+            document.querySelector('#edit-title').value = title;
+            document.querySelector('#edit-category').value = category;
+            document.querySelector('#edit-details').value = details;
+            document.querySelector('#edit-releaseDate').value = releaseDate;
 
-        // Handle form submission to add a new game
-    const addGameForm = document.getElementById('add-game-form');
-        addGameForm.addEventListener('submit', async (e) => {
+            // Open the edit game modal
+            const modal = new bootstrap.Modal(document.getElementById('editGameModal'));
+            modal.show();
+        }
+
+        // Handle form submission to edit a game
+        const editGameForm = document.querySelector('#edit-game-form');
+        editGameForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const formData = new FormData(editGameForm);
+            const gameId = formData.get('id');
 
-            const formData = new FormData(addGameForm);
-            const title = formData.get('title');
-            const category = formData.get('category');
-            const details = formData.get('details');
-            const releaseDate = formData.get('releaseDate');
-            const image = formData.get('image');
-            console.log(localStorage.getItem('token'));
             try {
-                const response = await fetch('http://localhost:3000/api/admin/game', {
-                    method: 'POST',
-                    headers: {
-                        // Send the JWT token in the 'Authorization' header
-                        'Authorization': `${localStorage.getItem('token')}`
-                    },
+                const response = await fetch(`http://localhost:3000/api/admin/games/${gameId}`, {
+                    method: 'PUT',
                     body: formData
                 });
 
                 if (response.ok) {
-                    // Game added successfully, fetch and display updated games list
-                    //fetchGames();
-                    console.log('game added successfully')
+                    alert('Game edited successfully');
+                    fetchGames(); // Refresh the games list after editing a game
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editGameModal'));
+                    modal.hide();
                 } else {
                     const errorData = await response.json();
-                    console.error('Failed to add game:', errorData.error);
+                    alert('Failed to edit game:', errorData.error);
                 }
             } catch (error) {
-                console.error('An error occurred:', error);
+                alert('An error occurred:', error);
             }
         });
+
+
+        // Function to handle deleting a game
+        async function deleteGame(gameId) {
+            if(confirm("You are about to delete this game")){
+                try {
+                    const response = await fetch(`http://localhost:3000/api/admin/games/${gameId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        alert('Game deleted successfully');
+                        fetchGames(); // Refresh the games list after deleting a game
+                    } else {
+                        const errorData = await response.json();
+                        alert('Failed to delete game:', errorData.error);
+                    }
+                } catch (error) {
+                    alert('An error occurred:', error);
+                }
+            }
+        }
     </script>
+    <script src="./assets/js/jquery.min.js"></script> <!-- jQuery -->
+    <script src="./assets/js/popper.min.js"></script> <!-- Popper.js -->
+    <script src="./assets/js/bootstrap.min.js"></script> <!-- Bootstrap.js -->
 </body>
-<script src="assets/js/bootstrap.min.js"></script>
 </html>

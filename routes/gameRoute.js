@@ -7,6 +7,9 @@ const gameController = require('../controllers/gameController');
 // Route to fetch all games
 router.get('/games', gameController.getAllGames);
 
+// Route for getting reviews by game ID
+router.get('/games/:id', gameController.getGamesByGameId);
+
 module.exports = router;
 
 

@@ -5,16 +5,21 @@ const db = require('../config/database');
 
 const Review = db.define('Review', {
   userID: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false
   },
   gameID: {
-    type: DataTypes.INTEGER
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  star_rating: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   reviews: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    allowNull: false
   },
-  // Add more fields as needed
 });
 
 module.exports = Review;

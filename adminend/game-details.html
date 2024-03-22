@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Details</title>
+    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/fonts/webfonts/fa-brands-400.ttf">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Game Review Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="home.html">Games List</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="add-games.html">Add Game</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1>Game Details</h1>
+        <div id="game-details-container" class="card">
+            <!-- Game details will be populated here using JavaScript -->
+            <div class="card-body">
+                <img class="mb-2" width="40%" id="game-image" src="" alt="Game Image">
+                <h5 class="card-title" id="game-title"></h5>
+                <p class="card-text" id="game-category"></p>
+                <p class="card-text" id="game-details"></p>
+                <p class="card-text" id="game-release-date"></p>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">User Reviews</h5>
+                <!-- User reviews will be populated here -->
+                <div id="user-reviews"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display game details
+        fetchGameDetails();
+
+        async function fetchGameDetails() {
+            // Get the game ID from the query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameId = urlParams.get('id');
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/games/${gameId}`);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch game details: ${response.status} ${response.statusText}`);
+                }
+
+                const game = await response.json();
+                // Populate game details on the page
+                document.getElementById('game-title').textContent = game[0].title;
+                document.getElementById('game-category').textContent = `Category: ${game[0].category}`;
+                document.getElementById('game-details').textContent = `Details: ${game[0].details}`;
+                document.getElementById('game-release-date').textContent = `Release Date: ${game[0].releaseDate}`;
+                document.getElementById('game-image').src = `http://localhost:3000/${game[0].image}`;
+
+                // Fetch and display user reviews
+                fetchUserReviews(gameId);
+            } catch (error) {
+                alert('An error occurred:', error);
+            }
+        }
+
+        // Fetch and display user reviews
+        async function fetchUserReviews(gameId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/user/games/${gameId}/reviews`);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch user reviews: ${response.status} ${response.statusText}`);
+                }
+
+                const reviews = await response.json();
+                console.log(reviews);
+                const userReviewsContainer = document.getElementById('user-reviews');
+                // Check if there are no reviews
+                if (reviews.length === 0) {
+                    userReviewsContainer.innerHTML = '<p>No reviews available</p>';
+                } else {
+                    // Populate user reviews on the page
+                    reviews.forEach(review => {
+                        const reviewElement = document.createElement('div');
+                        reviewElement.classList.add('card', 'mb-3');
+                        reviewElement.innerHTML = `
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">User: ${review.userID}</h6>
+                                <p class="card-text">Rating: <i class="fa fa-star"></i>${review.star_rating}</p>
+                                <p class="card-text">Review: ${review.reviews}</p>
+                                <button class="btn btn-danger" onclick="deleteReview('${review.id}')">Delete</button>
+                            </div>
+                        `;
+                        userReviewsContainer.appendChild(reviewElement);
+                    });
+                }
+            } catch (error) {
+                alert('An error occurred:', error);
+            }
+        }
+
+        // Function to delete a review
+        async function deleteReview(reviewId) {
+            if(confirm("You are about to delete this review")){
+                try {
+                    const response = await fetch(`http://localhost:3000/api/admin/reviews/${reviewId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        alert('Review deleted successfully');
+                    } else {
+                        const errorData = await response.json();
+                        alert('Failed to delete game:', errorData.error);
+                    }
+
+                    // Remove the review element from the DOM
+                    const reviewElement = document.getElementById(`review-${reviewId}`);
+                    reviewElement.parentNode.removeChild(reviewElement);
+                } catch (error) {
+                    alert('An error occurred:', error);
+                }
+            }
+        }
+    </script>
+
+    <script src="./assets/js/jquery.min.js"></script> <!-- jQuery -->
+    <script src="./assets/js/popper.min.js"></script> <!-- Popper.js -->
+    <script src="./assets/js/bootstrap.min.js"></script> <!-- Bootstrap.js -->
+</body>
+</html>

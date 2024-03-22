@@ -27,7 +27,7 @@ loginForm.addEventListener('submit', async (e) => {
         if (response.ok) {
             // Login successful
             const data = await response.json();
-            console.log('Login successful:', data);
+            alert('Login successful:', data);
             // Store token in local storage
             localStorage.setItem('token', data.token);
             // Redirect to home.html
@@ -35,9 +35,9 @@ loginForm.addEventListener('submit', async (e) => {
         } else {
             // Login failed
             const errorData = await response.json();
-            console.error('Login failed:', errorData.error);
+            alert('Login failed:', errorData.error);
         }
     } catch (error) {
-        console.error('An error occurred:', error);
+        alert('An error occurred:', error);
     }
 });

@@ -7,13 +7,13 @@ const User = require('../models/User');
 
 
 exports.userLogin = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
   
     try {
       // Check if admin exists
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { username } });
       if (!user) {
-        return res.status(401).json({ error: 'Invalid Email Address' });
+        return res.status(401).json({ error: 'Invalid Username' });
       }
   
       // Verify password
@@ -23,7 +23,7 @@ exports.userLogin = async (req, res) => {
       }
   
       // Generate JWT token
-      const token = jwt.sign({ userId: user.id }, 'your_secret_key', { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.id }, '123456789', { expiresIn: '1h' });
   
       res.json({ token });
     } catch (err) {

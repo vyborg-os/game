@@ -1,9 +1,11 @@
 // controllers/adminController.js
+
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const Game = require('../models/Games');
+const Review = require('../models/Review');
 
 exports.adminLogin = async (req, res) => {
   const { username, password } = req.body;
@@ -22,7 +24,7 @@ exports.adminLogin = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ adminId: admin.id }, 'your_secret_key', { expiresIn: '1h' });
+    const token = jwt.sign({ adminId: admin.id }, '123456789', { expiresIn: '1h' });
 
     res.json({ token });
   } catch (err) {
@@ -57,7 +59,7 @@ exports.adminReg = async (req, res) => {
     }
   };
   // Get all games
-exports.getAllGames = async (req, res) => {
+  exports.getAllGames = async (req, res) => {
     try {
       const games = await Game.findAll();
       res.json(games);
@@ -67,65 +69,57 @@ exports.getAllGames = async (req, res) => {
     }
   };
   
-// Set up multer storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'images/') 
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-});
 
-// Initialize multer with the specified storage
-const upload = multer({ storage: storage });
 
-// Add a new game with image upload
-exports.addGame = upload.single('image'), async (req, res) => {
-    const { title, category, details, releaseDate } = req.body;
-    const image = req.file.path; // Get the path of the uploaded image
+// Add a new game
+exports.addGame =  async (req, res) => {
+  console.log(req.body)
+  console.log(req.file)
+  const { title, category, details, releaseDate } = req.body;
+  const image = req.file.path; // Get the path of the uploaded image
 
-    try {
-        const newGame = await Game.create({ title, category, details, image, releaseDate });
-        res.json(newGame);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+  try {
+      const newGame = await Game.create({ title, category, details, image, releaseDate });
+      res.json(newGame);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
-// Update a game with image upload
-exports.updateGame = upload.single('image'), async (req, res) => {
-    const gameId = req.params.id;
-    const { title, category, details, releaseDate } = req.body;
-    const image = req.file.path; // Get the path of the uploaded image
+// Update a game
+exports.updateGame =  async (req, res) => {
+  const id = req.params.id;
+  const { title, category, details, releaseDate } = req.body;
+  const image = req.file.path; // Get the path of the uploaded image
 
-    try {
-        const game = await Game.findByPk(gameId);
-        if (!game) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
+  try {
+      const game = await Game.findByPk(id);
+      if (!game) {
+          return res.status(404).json({ error: 'Game not found' });
+      }
 
-        game.title = title;
-        game.category = category;
-        game.details = details;
-        game.image = image;
-        game.releaseDate = releaseDate;
+      game.title = title;
+      game.category = category;
+      game.details = details;
+      game.image = image;
+      game.releaseDate = releaseDate;
 
-        await game.save();
+      await game.save();
 
-        res.json(game);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+      res.json(game);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+  }
 };
+  
   // Delete a game
   exports.deleteGame = async (req, res) => {
-    const gameId = req.params.id;
+    const id = req.params.id;
   
     try {
-      const game = await Game.findByPk(gameId);
+      const game = await Game.findByPk(id);
       if (!game) {
         return res.status(404).json({ error: 'Game not found' });
       }
@@ -139,4 +133,20 @@ exports.updateGame = upload.single('image'), async (req, res) => {
     }
   };
   
+  // Delete a review
+  exports.deleteReview = async (req, res) => {
+    const id = req.params.id;
+    try {
+      const review = await Review.findByPk(id);
+      if (!review) {
+        return res.status(404).json({ error: 'Review not found' });
+      }
   
+      await review.destroy();
+  
+      res.json({ message: 'Review deleted successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };

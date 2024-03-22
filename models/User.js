@@ -4,19 +4,6 @@ const { DataTypes } = require('sequelize');
 const db = require('../config/database');
 const bcrypt = require('bcryptjs');
 
-// const User = db.define('User', {
-//   title: {
-//     type: DataTypes.STRING,
-//     allowNull: false
-//   },
-//   genre: {
-//     type: DataTypes.STRING
-//   },
-//   releaseDate: {
-//     type: DataTypes.DATE
-//   },
-//   // Add more fields as needed
-// });
 const User = db.define('User', {
   username: {
     type: DataTypes.STRING,
